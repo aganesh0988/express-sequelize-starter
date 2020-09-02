@@ -60,4 +60,50 @@ router.post(
   })
 );
 
+router.get(
+  "/:id(\\d+)",
+  asyncHandler(async (req, res, next) => {
+    const taskId = parseInt(req.params.id, 10);
+    const task = await Task.findByPk(taskId);
+
+    if (task) {
+      res.json({ task });
+    } else {
+      next(taskNotFoundError(taskId));
+    }
+  })
+);
+
+router.put(
+  "/:id(\\d+)",
+  validateTask,
+  handleValidationErrors,
+  asyncHandler(async (req, res, next) => {
+    const taskId = parseInt(req.params.id, 10);
+    const task = await Task.findByPk(taskId);
+
+    if (task) {
+      await task.update({ name: req.body.name });
+      res.json({ task });
+    } else {
+      next(taskNotFoundError(taskId));
+    }
+  })
+);
+
+router.delete(
+  "/:id(\\d+)",
+  asyncHandler(async (req, res, next) => {
+    const taskId = parseInt(req.params.id, 10);
+    const task = await Task.findByPk(taskId);
+
+    if (task) {
+      await task.destroy();
+      res.status(204).end();
+    } else {
+      next(taskNotFoundError(taskId));
+    }
+  })
+);
+
 module.exports = router;
